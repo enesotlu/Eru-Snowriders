@@ -5,10 +5,10 @@ const createTransporter = () => {
   // For development you can use your own Gmail with App Passwords
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // TLS
+    port: 465,
+    secure: true, // Render'ın 587 bariyerini geçmek için direkt SSL
     requireTLS: true,
-    family: 4, // Sadece IPv4 kullansın (IPv6'dan kaynaklı ENETUNREACH hatasını önler)
+    family: 4, 
     auth: {
       user: process.env.EMAIL_USER?.trim(),
       pass: process.env.EMAIL_PASS?.replace(/\s+/g, '') // Google App Password boşluklarını temizler
@@ -57,7 +57,7 @@ const sendVerificationEmail = async (to, code) => {
     console.error('Email sending error (Verification):', error.message);
     console.error('SMTP Config Used:', {
       host: 'smtp.gmail.com',
-      port: 587,
+      port: 465,
       secure: false,
       tls: { rejectUnauthorized: false },
       userProvided: !!process.env.EMAIL_USER?.trim(),
@@ -102,7 +102,7 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
     console.error('Email sending error (Password Reset):', error.message);
     console.error('SMTP Config Used:', {
       host: 'smtp.gmail.com',
-      port: 587,
+      port: 465,
       secure: false,
       tls: { rejectUnauthorized: false },
       userProvided: !!process.env.EMAIL_USER?.trim(),
