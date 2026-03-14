@@ -5,12 +5,18 @@ const createTransporter = () => {
   // For development you can use your own Gmail with App Passwords
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_USER?.trim(),
       pass: process.env.EMAIL_PASS?.trim()
-    }
+    },
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 15000, // 15 seconds
+    greetingTimeout: 15000,
+    socketTimeout: 15000
   });
 };
 
@@ -46,7 +52,15 @@ const sendVerificationEmail = async (to, code) => {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('Email sending error (Verification):', error.message);
+    console.error('SMTP Config Used:', {
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      tls: { rejectUnauthorized: false },
+      userProvided: !!process.env.EMAIL_USER?.trim(),
+      passProvided: !!process.env.EMAIL_PASS?.trim()
+    });
     return false;
   }
 };
@@ -83,7 +97,15 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('Email sending error (Password Reset):', error.message);
+    console.error('SMTP Config Used:', {
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      tls: { rejectUnauthorized: false },
+      userProvided: !!process.env.EMAIL_USER?.trim(),
+      passProvided: !!process.env.EMAIL_PASS?.trim()
+    });
     return false;
   }
 };
