@@ -114,7 +114,10 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">{t('login.email')}</label>
               <input
+                id="email"
+                name="email"
                 type="email"
+                autoComplete="username email"
                 required
                 value={form.email}
                 onChange={e => setForm({ ...form, email: e.target.value })}
@@ -125,7 +128,10 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">{t('login.password')}</label>
               <input
+                id="password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 required
                 value={form.password}
                 onChange={e => setForm({ ...form, password: e.target.value })}
