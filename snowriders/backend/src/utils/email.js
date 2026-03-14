@@ -6,10 +6,12 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // true for 465, false for other ports
+    secure: false, // TLS
+    requireTLS: true,
+    family: 4, // Sadece IPv4 kullansın (IPv6'dan kaynaklı ENETUNREACH hatasını önler)
     auth: {
       user: process.env.EMAIL_USER?.trim(),
-      pass: process.env.EMAIL_PASS?.trim()
+      pass: process.env.EMAIL_PASS?.replace(/\s+/g, '') // Google App Password boşluklarını temizler
     },
     tls: {
       rejectUnauthorized: false
@@ -44,7 +46,7 @@ const sendVerificationEmail = async (to, code) => {
           <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
             <h1 style="color: #2563eb; margin: 0; font-size: 32px; letter-spacing: 5px;">${code}</h1>
           </div>
-          <p style="color: #64748b; font-size: 14px; text-align: center;">Bu kod 15 dakika boyunca geçerlidir.</p>
+          <p style="color: #64748b; font-size: 14px; text-align: center;">Bu kod 10 dakika boyunca geçerlidir.</p>
         </div>
       `
     };

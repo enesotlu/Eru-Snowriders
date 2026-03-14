@@ -71,7 +71,7 @@ router.post('/register', [
 
     // OTP oluştur
     const verificationCode = generateOTP();
-    const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 dk
+    const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 dk
 
     // Kullanıcı oluştur (isVerified: false)
     await User.create({
@@ -84,8 +84,10 @@ router.post('/register', [
     // Log out the OTP for local debugging
     console.log('\n==============================\n🔑 OTP KODU:', verificationCode, '\n==============================\n');
     
-    // Doğrulama mailini gönder
-    await sendVerificationEmail(email, verificationCode);
+    // Doğrulama mailini arka planda asenkron gönder (kullanıcıyı bekletmemek için)
+    sendVerificationEmail(email, verificationCode).catch(err => {
+      console.error('Arka planda mail gönderimi başarısız:', err);
+    });
 
     res.status(201).json({
       success: true,
@@ -160,11 +162,13 @@ router.post('/resend-code', [
 
     const verificationCode = generateOTP();
     user.verificationCode = verificationCode;
-    user.verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+    user.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 dk
     await user.save();
 
     console.log('\n==============================\n🔑 YENİ OTP KODU:', verificationCode, '\n==============================\n');
-    await sendVerificationEmail(email, verificationCode);
+    
+    // Doğrulama mailini arka planda asenkron gönder
+    sendVerificationEmail(email, verificationCode).catch(err => console.error(err));
     res.json({ success: true, message: 'Yeni doğrulama kodu gönderildi.' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Sunucu hatası' });
