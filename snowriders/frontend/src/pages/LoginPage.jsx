@@ -5,7 +5,7 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
-  const { loginUser } = useAuth();
+  const { loginUser, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -23,6 +23,17 @@ export default function LoginPage() {
       window.history.replaceState({}, document.title);
     }
   }, [location]);
+
+  // Eğer kullanıcı zaten giriş yapmışsa (Beni Hatırla) direkt panele yönlendir
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, navigate]);
 
   const handleTabChange = (t) => {
     setTab(t);
@@ -85,10 +96,6 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
-          <div className="flex gap-1 bg-slate-100 rounded-xl p-1 mb-6">
-            {tabBtn('user', '👤 Kullanıcı Girişi')}
-            {tabBtn('admin', '⚙️ Admin Girişi')}
-          </div>
 
           {successMsg && (
             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm">{successMsg}</div>
