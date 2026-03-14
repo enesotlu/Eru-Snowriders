@@ -286,8 +286,8 @@ router.post('/forgot-password', [
 
     await user.save();
 
-    // Frontend URL'sini dinamik olarak isteğin geldiği origin'den (veya env'den) al
-    const clientUrl = req.headers.origin || process.env.CLIENT_URL || 'http://localhost:5173';
+    // Frontend URL'sini dinamik oluştur, yoksa Firebase production URL'sine git
+    const clientUrl = req.headers.origin || process.env.CLIENT_URL || 'https://eru-snowriders.web.app';
     const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     
     // utils/email.js içindeki importu düzeltmemiz lazım
