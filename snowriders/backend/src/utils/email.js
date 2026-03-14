@@ -35,10 +35,13 @@ const sendVerificationEmail = async (to, code) => {
       })
     });
 
-    if (response.ok) {
+    // CORS ve Redirect durumunda Google her zaman bir HTML sayfası veya text döndürür
+    const textResult = await response.text();
+    
+    if (response.ok || response.type === 'opaque') {
       return true;
     } else {
-      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, ')');
+      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, 'Body:', textResult.substring(0, 100), ')');
       return false;
     }
   } catch (error) {
@@ -81,10 +84,12 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
       })
     });
 
-    if (response.ok) {
+    const textResult = await response.text();
+
+    if (response.ok || response.type === 'opaque') {
       return true;
     } else {
-      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız oldu (Status:', response.status, ')');
+      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız (Status:', response.status, 'Body:', textResult.substring(0, 100), ')');
       return false;
     }
   } catch (error) {

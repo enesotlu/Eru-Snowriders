@@ -286,8 +286,9 @@ router.post('/forgot-password', [
 
     await user.save();
 
-    // Frontend URL'sini oluştur
-    const resetUrl = `${req.protocol}://${req.get('host').replace('5000', '5173')}/reset-password/${resetToken}`;
+    // Frontend URL'sini dinamik olarak isteğin geldiği origin'den (veya env'den) al
+    const clientUrl = req.headers.origin || process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     
     // utils/email.js içindeki importu düzeltmemiz lazım
     const { sendPasswordResetEmail } = require('../utils/email');
