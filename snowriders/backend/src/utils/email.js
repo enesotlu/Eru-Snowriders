@@ -27,7 +27,7 @@ const sendVerificationEmail = async (to, code) => {
 
     const response = await fetch(scriptUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         recipient: to,
         subject: 'Erü Snowriders - Email Doğrulama Kodunuz',
@@ -35,11 +35,10 @@ const sendVerificationEmail = async (to, code) => {
       })
     });
 
-    const result = await response.json();
-    if (result.status === 'success') {
+    if (response.ok) {
       return true;
     } else {
-      console.error('GAS Webhook Hatası:', result.message);
+      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, ')');
       return false;
     }
   } catch (error) {
@@ -74,7 +73,7 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
 
     const response = await fetch(scriptUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         recipient: to,
         subject: 'Erü Snowriders - Şifre Sıfırlama İstemi',
@@ -82,11 +81,10 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
       })
     });
 
-    const result = await response.json();
-    if (result.status === 'success') {
+    if (response.ok) {
       return true;
     } else {
-      console.error('GAS Webhook Hatası (Reset Password):', result.message);
+      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız oldu (Status:', response.status, ')');
       return false;
     }
   } catch (error) {
