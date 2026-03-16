@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { sendVerificationEmail } = require('../utils/email');
+const emailUtils = require('../utils/email');
 
 const router = express.Router();
 
@@ -85,8 +85,11 @@ router.post('/register', [
     console.log('\n==============================\n🔑 OTP KODU:', verificationCode, '\n==============================\n');
     
     // Doğrulama mailini arka planda asenkron gönder (kullanıcıyı bekletmemek için)
-    sendVerificationEmail(email, verificationCode).catch(err => {
-      console.error('Arka planda mail gönderimi başarısız:', err);
+    emailUtils.sendVerificationEmail(email, verificationCode).then(success => {
+      if (success) console.log(`✅ Doğrulama maili gönderildi: ${email}`);
+      else console.error(`❌ Doğrulama maili GÖNDERİLEMEDİ: ${email}`);
+    }).catch(err => {
+      console.error('Arka planda mail gönderimi hatası:', err);
     });
 
     res.status(201).json({
@@ -290,9 +293,10 @@ router.post('/forgot-password', [
     const clientUrl = req.headers.origin || process.env.CLIENT_URL || 'https://eru-snowriders.web.app';
     const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     
-    // utils/email.js içindeki importu düzeltmemiz lazım
-    const { sendPasswordResetEmail } = require('../utils/email');
-    await sendPasswordResetEmail(user.email, resetUrl);
+    // Şifre sıfırlama maili gönder
+    console.log(`\n==============================\n📧 RESET TOKEN: ${resetToken}\n==============================\n`);
+    
+    await emailUtils.sendPasswordResetEmail(user.email, resetUrl);
 
     res.json({ success: true, message: 'Şifre sıfırlama bağlantısı emailinize gönderildi.' });
   } catch (err) {

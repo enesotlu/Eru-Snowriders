@@ -5,6 +5,8 @@ const sendVerificationEmail = async (to, code) => {
   try {
     const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
     
+    console.log(`[Email] Doğrulama maili hazırlanıyor: ${to}`);
+
     if (!scriptUrl) {
        console.log('----------------------------------------------------');
        console.log(`[DEV MODE] GOOGLE_SCRIPT_URL eksik! E-posta konsola basıldı.`);
@@ -25,6 +27,8 @@ const sendVerificationEmail = async (to, code) => {
       </div>
     `;
 
+    console.log(`[Email] GAS Webhook'a istek gönderiliyor... URL: ${scriptUrl.substring(0, 30)}...`);
+    
     const response = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -35,13 +39,13 @@ const sendVerificationEmail = async (to, code) => {
       })
     });
 
-    // CORS ve Redirect durumunda Google her zaman bir HTML sayfası veya text döndürür
     const textResult = await response.text();
+    console.log(`[Email] GAS Yanıtı (Status ${response.status}): ${textResult.substring(0, 100)}`);
     
     if (response.ok || response.type === 'opaque') {
       return true;
     } else {
-      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, 'Body:', textResult.substring(0, 100), ')');
+      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, ')');
       return false;
     }
   } catch (error) {
@@ -54,6 +58,8 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
   try {
     const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
     
+    console.log(`[Email] Şifre sıfırlama maili hazırlanıyor: ${to}`);
+
     if (!scriptUrl) {
        console.log('----------------------------------------------------');
        console.log(`[DEV MODE] GOOGLE_SCRIPT_URL eksik! E-posta konsola basıldı.`);
@@ -74,6 +80,8 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
       </div>
     `;
 
+    console.log(`[Email] GAS Webhook'a istek gönderiliyor (Password Reset)...`);
+
     const response = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -85,11 +93,12 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
     });
 
     const textResult = await response.text();
+    console.log(`[Email] GAS Yanıtı (Reset): ${textResult.substring(0, 100)}`);
 
     if (response.ok || response.type === 'opaque') {
       return true;
     } else {
-      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız (Status:', response.status, 'Body:', textResult.substring(0, 100), ')');
+      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız (Status:', response.status, ')');
       return false;
     }
   } catch (error) {

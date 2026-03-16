@@ -53,6 +53,11 @@ router.post('/:id/register', protect, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Bu etkinliğin tarihi geçmiş, kayıt yapılamaz' });
     }
 
+    // Son kayıt tarihi geçmiş mi?
+    if (event.registrationDeadline && new Date(event.registrationDeadline) < new Date()) {
+      return res.status(400).json({ success: false, message: 'Son kayıt tarihi geçmiştir. Kayıt kilitlendi.' });
+    }
+
     // Kontenjan dolu mu?
     if (event.registeredUsers.length >= event.capacity) {
       return res.status(400).json({ success: false, message: 'Kontenjan doldu' });
@@ -66,10 +71,10 @@ router.post('/:id/register', protect, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Bu etkinliğe zaten kayıt oldunuz.' });
     }
 
-    // Kayıt oluştur
+    // Kayıt oluştur (Transaction olmadığı için sıralama önemli)
     await Registration.create({ userId: req.user._id, eventId: event._id });
     
-    // Event'e kullanıcıyı ekle
+    // Event'e kullanıcıyı ekle (Array sync)
     event.registeredUsers.push(req.user._id);
     await event.save();
 

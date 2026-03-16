@@ -1,0 +1,113 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+
+export default function TopNavbar() {
+  const { user, logoutUser, isAdmin } = useAuth();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/login');
+  };
+
+  const getInitials = (name, surname) => {
+    if (!name && !surname) return '👤';
+    return `${name?.charAt(0) || ''}${surname?.charAt(0) || ''}`.toUpperCase();
+  };
+
+  return (
+    <nav className="h-20 px-10 flex items-center justify-between bg-transparent sticky top-0 z-[60]">
+      
+      {/* Page Title Context */}
+      <div className="flex items-center gap-4">
+         <h2 className="text-xl font-black text-slate-800 tracking-tight capitalize">
+            {(() => {
+              const path = location.pathname;
+              if (path.startsWith('/events/') && path.split('/').length > 2) return 'Etkinlik Detayı';
+              return path.split('/').filter(Boolean).pop() || 'Dashboard';
+            })()}
+         </h2>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-6">
+        
+        {/* Language Switcher */}
+        <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200">
+          <button 
+            onClick={() => changeLanguage('tr')}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all uppercase tracking-widest ${i18n.language === 'tr' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+          >
+            TR
+          </button>
+          <button 
+            onClick={() => changeLanguage('en')}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all uppercase tracking-widest ${i18n.language === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+          >
+            EN
+          </button>
+        </div>
+
+
+        {/* User Profile */}
+        <div className="relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-slate-100 hover:bg-slate-200 transition-all border border-slate-200"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#6366f1] flex items-center justify-center text-white text-[11px] font-bold overflow-hidden border border-white shadow-sm">
+              {user?.profileImage ? (
+                <img src={`http://localhost:5000${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                getInitials(user?.name, user?.surname)
+              )}
+            </div>
+            <div className="text-left hidden lg:block">
+              <p className="text-[12px] font-bold text-slate-700 leading-none">{user?.name} <span className="text-[10px] text-slate-400 font-medium ml-1">▼</span></p>
+            </div>
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-white border border-slate-100 shadow-xl p-2 py-2.5 animate-in fade-in zoom-in-95 duration-200">
+              <Link 
+                to="/profile" 
+                onClick={() => setDropdownOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all"
+              >
+                <svg className="w-4 h-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                {t('nav.profile')}
+              </Link>
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-50 transition-all text-left"
+              >
+                <svg className="w-4 h-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                {t('nav.logout')}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}

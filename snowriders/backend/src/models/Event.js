@@ -12,9 +12,23 @@ const eventSchema = new mongoose.Schema({
     required: [true, 'Açıklama zorunludur'],
     maxlength: [1000, 'Açıklama 1000 karakterden fazla olamaz']
   },
+  registrationDeadline: {
+    type: Date,
+    required: [true, 'Son kayıt tarihi zorunludur']
+  },
   date: {
     type: Date,
     required: [true, 'Etkinlik tarihi zorunludur']
+  },
+  startTime: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  endTime: {
+    type: String,
+    trim: true,
+    default: ''
   },
   location: {
     type: String,
@@ -50,6 +64,15 @@ eventSchema.virtual('isFull').get(function() {
 // Sanal alan: tarih geçti mi?
 eventSchema.virtual('isPast').get(function() {
   return new Date(this.date) < new Date();
+});
+
+// Sanal alan: kayıt kapandı mı?
+eventSchema.virtual('isRegistrationClosed').get(function() {
+  if (!this.registrationDeadline) return false;
+  
+  // Set the deadline to the end of the day (23:59:59.999) if no specific time is provided,
+  // or just compare directly. For simplicity, we compare directly.
+  return new Date(this.registrationDeadline) < new Date();
 });
 
 eventSchema.set('toJSON', { virtuals: true });

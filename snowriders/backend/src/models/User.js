@@ -56,7 +56,11 @@ const userSchema = new mongoose.Schema({
   verificationCode: String,
   verificationCodeExpires: Date,
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  profileImage: {
+    type: String,
+    default: ''
+  }
 }, { timestamps: true });
 
 // Password'ü kaydetmeden önce hashle

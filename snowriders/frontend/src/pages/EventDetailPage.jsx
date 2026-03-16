@@ -1,127 +1,290 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../api/axios';
+import { getEventTheme, extractLocationLink, getLocationTitle } from '../utils/theme';
 
 export default function EventDetailPage() {
   const { id } = useParams();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
-    api.get(`/events/${id}`).then(res => { setEvent(res.data.event); setLoading(false); }).catch(() => navigate('/events'));
-  }, [id]);
+    api.get(`/events/${id}`).then(res => { 
+      setEvent(res.data.event); 
+      setLoading(false); 
+    }).catch(() => navigate('/events'));
+  }, [id, navigate]);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') navigate('/events');
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [navigate]);
 
   const handleRegister = async () => {
     setActionLoading(true); setMessage({ type: '', text: '' });
     try {
       await api.post(`/events/${id}/register`);
       setEvent(prev => ({ ...prev, isRegistered: true, registeredUsers: [...(prev.registeredUsers || []), 'me'] }));
-      setMessage({ type: 'success', text: 'Etkinliğe başarıyla kayıt oldunuz! 🎉' });
+      setMessage({ type: 'success', text: t('event_detail.success_registered') });
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'Kayıt yapılamadı' });
+      setMessage({ type: 'error', text: err.response?.data?.message || t('event_detail.errors.failed_register') });
     } finally { setActionLoading(false); }
   };
 
   const handleCancel = async () => {
-    if (!confirm('Kaydınızı iptal etmek istediğinize emin misiniz?')) return;
+    setCancelConfirm(false);
     setActionLoading(true);
     try {
       await api.delete(`/events/${id}/register`);
       setEvent(prev => ({ ...prev, isRegistered: false, registeredUsers: (prev.registeredUsers || []).slice(0, -1) }));
-      setMessage({ type: 'info', text: 'Etkinlik kaydınız iptal edildi.' });
+      setMessage({ type: 'info', text: t('event_detail.success_cancelled') });
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'İptal yapılamadı' });
+      setMessage({ type: 'error', text: err.response?.data?.message || t('event_detail.errors.failed_cancel') });
     } finally { setActionLoading(false); }
   };
 
-  if (loading) return <div className="text-center py-20 text-slate-400">Yükleniyor...</div>;
-  if (!event) return null;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-40">
+      <div className="w-10 h-10 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{t('dashboard.loading')}</p>
+    </div>
+  );
+  if (!event) return (
+    <div className="flex flex-col items-center justify-center py-40">
+      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{t('events.not_found')}</p>
+    </div>
+  );
 
   const registered = event.registeredUsers?.length ?? 0;
-  const pct = Math.min(100, (registered / event.capacity) * 100);
+  const theme = getEventTheme(id);
+  const mapLink = extractLocationLink(event.location);
+  const locationTitle = getLocationTitle(event.location);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
-      {/* Back */}
-      <button onClick={() => navigate('/events')} className="flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">
-        ← Etkinliklere Dön
+    <div className="max-w-4xl mx-auto space-y-10 pb-20 px-4">
+      {/* Back Navigation */}
+      <button 
+        onClick={() => navigate('/events')} 
+        className="group flex items-center gap-4 text-[10px] font-black text-white/40 hover:text-white transition-all uppercase tracking-[0.4em]"
+      >
+        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/20 group-hover:translate-x-[-4px] transition-all">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </div>
+        {t('event_detail.back')}
       </button>
 
-      {/* Header Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            {event.isPast && <span className="text-xs bg-white/20 text-white font-semibold px-2 py-1 rounded-full mb-2 inline-block">Sona Erdi</span>}
-            {event.isFull && !event.isPast && <span className="text-xs bg-red-400/80 text-white font-semibold px-2 py-1 rounded-full mb-2 inline-block">Kontenjan Doldu</span>}
-            {!event.isPast && !event.isFull && <span className="text-xs bg-emerald-400/80 text-white font-semibold px-2 py-1 rounded-full mb-2 inline-block">Kayıt Açık</span>}
-            <h1 className="text-2xl font-bold mt-1">{event.title}</h1>
+      {/* Main Container */}
+      <div className="bg-white rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.3)] overflow-hidden">
+        
+        {/* Header Section with Dynamic Gradient */}
+        <div className={`p-12 lg:p-20 relative overflow-hidden bg-gradient-to-br ${theme.bg} text-white`}>
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 blur-[100px] rounded-full"></div>
+          
+          <div className="relative z-10">
+            <div className="flex flex-wrap gap-4 mb-8">
+              {event.isPast ? (
+                <span className="bg-black/20 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">{t('events.completed')}</span>
+              ) : event.isRegistrationClosed ? (
+                <span className="bg-[#212349]/40 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">{t('event_detail.registration_closed')}</span>
+              ) : event.isFull ? (
+                <span className="bg-red-500/40 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">{t('event_detail.full')}</span>
+              ) : (
+                <span className="bg-emerald-500/40 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">{t('dashboard.status.open')}</span>
+              )}
+            </div>
+            
+            <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-none uppercase drop-shadow-2xl mb-12">{event.title}</h1>
+            
+            <div className="flex flex-wrap items-center gap-x-12 gap-y-6">
+               <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  </div>
+                  <span className="text-[13px] font-black uppercase tracking-widest">{new Date(event.date).toLocaleDateString()}</span>
+               </div>
+               <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <span className="text-[13px] font-black uppercase tracking-widest">{event.startTime || '20:00'} - {event.endTime || '21:00'}</span>
+               </div>
+            </div>
           </div>
-          <span className="text-4xl">🏔️</span>
+          
+          <button onClick={() => navigate('/events')} className="absolute top-10 right-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all backdrop-blur-md group">
+             <svg className="w-6 h-6 text-white group-hover:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
-      </div>
 
-      {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-          <p className="text-xs text-slate-400 mb-1 font-medium uppercase tracking-wide">Tarih</p>
-          <p className="font-semibold text-slate-800">
-            {new Date(event.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </p>
-        </div>
-        {event.location && (
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-            <p className="text-xs text-slate-400 mb-1 font-medium uppercase tracking-wide">Konum</p>
-            <p className="font-semibold text-slate-800">{event.location}</p>
+        {/* Content Section */}
+        <div className="p-10 lg:p-16 space-y-12 bg-white">
+          
+          {/* Metrics List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Location Card */}
+            {mapLink ? (
+              <a 
+                href={mapLink}
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={`bg-white rounded-[2.5rem] p-8 border-2 ${theme.border.replace('/20', '/60')} flex items-center gap-6 shadow-sm hover:shadow-xl transition-all group cursor-pointer active:scale-95`}
+              >
+                <div className={`w-16 h-16 rounded-2xl ${theme.lightBg} flex items-center justify-center ${theme.text} shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z" /></svg>
+                </div>
+                <div className="flex-1">
+                    <p className={`text-[12px] font-black ${theme.text} uppercase tracking-widest leading-none mb-3 opacity-70`}>{t('event_detail.location')}</p>
+                    <h3 className={`text-2xl font-black ${theme.text} tracking-tight uppercase leading-none truncate`}>
+                      {getLocationTitle(event.location) || t('event_detail.open_map')}
+                    </h3>
+                </div>
+              </a>
+            ) : (
+              <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 flex items-center gap-6 shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                    <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">{t('event_detail.location')}</p>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase leading-none truncate">
+                      {event.location || 'Erciyes'}
+                    </h3>
+                </div>
+              </div>
+            )}
+
+            {/* Registration Progress */}
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 flex items-center gap-6 shadow-sm">
+              <div className={`w-16 h-16 rounded-2xl ${theme.lightBg} flex items-center justify-center ${theme.text}`}>
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className={`text-[12px] font-black ${theme.text} uppercase tracking-widest leading-none mb-3 opacity-70`}>{t('event_detail.capacity')}</p>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-4xl font-black ${theme.text} tracking-tighter`}>{event.registeredUsers?.length || 0}</span>
+                  <span className="text-slate-300 font-bold">/</span>
+                  <span className="text-slate-400 font-bold">{event.capacity}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Registration Deadline Check (Today) */}
+            <div className={`bg-white rounded-[2.5rem] p-8 border border-slate-100 flex items-center gap-6 shadow-sm`}>
+              <div className={`w-16 h-16 rounded-2xl ${theme.lightBg} flex items-center justify-center ${theme.text}`}>
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className={`text-[12px] font-black ${theme.text} uppercase tracking-widest leading-none mb-3 opacity-70`}>{t('event_detail.deadline')}</p>
+                <h3 className={`text-2xl font-black ${theme.text} tracking-tight uppercase leading-none`}>
+                  {event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleDateString() : t('event_detail.not_specified')}
+                </h3>
+              </div>
+            </div>
           </div>
-        )}
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm col-span-2">
-          <p className="text-xs text-slate-400 mb-2 font-medium uppercase tracking-wide">Kontenjan</p>
-          <div className="flex items-center justify-between mb-2">
-            <p className="font-semibold text-slate-800">{registered} / {event.capacity} kişi</p>
-            <p className="text-sm text-slate-500">{event.remainingCapacity} kalan</p>
+
+          {/* Registration Deadline Warning */}
+          {!event.isPast && event.registrationDeadline && !event.isRegistered && (
+            <div className="bg-red-50/80 rounded-[2rem] p-8 border border-red-100 flex items-center gap-6 shadow-sm mb-12">
+               <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-sm border border-red-100">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+               </div>
+               <div>
+                 <p className="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] leading-none mb-3">{t('event_detail.last_chance')}</p>
+                 <p className="text-xl font-black text-red-900 uppercase tracking-tight">
+                    {new Date(event.registrationDeadline).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
+                 </p>
+               </div>
+            </div>
+          )}
+
+          {/* Description Section */}
+          <div className="space-y-8 bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100/50 mb-12">
+             <div className="flex items-center gap-4">
+                <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none mb-0.5">{t('event_detail.description')}</h2>
+                <div className="h-px bg-slate-200 flex-1"></div>
+             </div>
+              <p className="text-slate-800 text-[16px] leading-relaxed font-bold whitespace-pre-wrap selection:bg-[#00AEEF]/20">
+                {event.description}
+              </p>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full ${event.isFull ? 'bg-red-400' : 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
-          </div>
-        </div>
-      </div>
 
-      {/* Description */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-        <h2 className="font-bold text-slate-800 mb-3">Etkinlik Hakkında</h2>
-        <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{event.description}</p>
-      </div>
+          {/* Messages */}
+          {message.text && (
+            <div className={`p-8 rounded-3xl text-[11px] font-black uppercase tracking-wider border transition-all animate-in slide-in-from-top-4 duration-500 shadow-sm mb-12 ${
+              message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+              message.type === 'error' ? 'bg-red-50 text-red-500 border-red-100' :
+              'bg-blue-50 text-blue-600 border-blue-100'
+            }`}>
+              <div className="flex items-center gap-4">
+                 <div className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} animate-pulse`}></div>
+                 {message.text}
+              </div>
+            </div>
+          )}
 
-      {/* Message */}
-      {message.text && (
-        <div className={`p-4 rounded-2xl text-sm font-medium ${
-          message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-          message.type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' :
-          'bg-blue-50 text-blue-600 border border-blue-200'
-        }`}>
-          {message.text}
-        </div>
-      )}
-
-      {/* Action Button */}
-      {!event.isPast && (
-        <div>
-          {event.isRegistered ? (
-            <button onClick={handleCancel} disabled={actionLoading}
-              className="w-full py-4 bg-white border border-red-200 text-red-500 hover:bg-red-50 font-semibold rounded-2xl transition disabled:opacity-60">
-              {actionLoading ? 'İşleniyor...' : 'Kaydımı İptal Et'}
-            </button>
-          ) : (
-            <button onClick={handleRegister} disabled={actionLoading || event.isFull}
-              className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition disabled:opacity-60">
-              {actionLoading ? 'Kaydediliyor...' : event.isFull ? 'Kontenjan Doldu' : 'Etkinliğe Kayıt Ol'}
-            </button>
+          {/* Actions */}
+          {!event.isPast && (
+            <div className="pt-6">
+              {event.isRegistered ? (
+                cancelConfirm ? (
+                  <div className="bg-slate-50/50 rounded-[2.5rem] p-12 border border-slate-100 text-center space-y-10 animate-in zoom-in-95 duration-500 shadow-inner">
+                    <p className="text-slate-800 font-black text-xl uppercase tracking-tight">{t('event_detail.cancel_confirm')}</p>
+                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                      <button onClick={handleCancel} disabled={actionLoading}
+                        className="flex-1 py-5 bg-red-500 text-white font-black rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-red-500/20 hover:bg-red-600 hover:scale-[1.02]">
+                        {actionLoading ? t('event_detail.processing') : t('event_detail.cancel_yes')}
+                      </button>
+                      <button onClick={() => setCancelConfirm(false)} disabled={actionLoading}
+                        className="flex-1 py-5 bg-white text-slate-400 font-black rounded-2xl border border-slate-100 transition-all uppercase tracking-widest text-[11px] hover:border-slate-200">
+                        {t('event_detail.cancel_no')}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setCancelConfirm(true)} 
+                    disabled={actionLoading}
+                    className="w-full py-8 bg-white text-slate-300 hover:text-red-500 hover:bg-red-50/50 font-black tracking-widest rounded-[2rem] transition-all uppercase text-[10px] border border-slate-100 group shadow-sm"
+                  >
+                    {actionLoading ? t('event_detail.processing') : t('event_detail.cancel_action')}
+                  </button>
+                )
+              ) : (
+                <button 
+                  onClick={handleRegister} 
+                  disabled={actionLoading || event.isFull || event.isRegistrationClosed}
+                  className={`w-full py-10 text-white font-black tracking-[0.4em] rounded-[2.5rem] transition-all transform hover:scale-[1.01] uppercase text-xl shadow-2xl relative overflow-hidden group
+                    ${actionLoading || event.isFull || event.isRegistrationClosed 
+                      ? 'bg-slate-100 text-slate-300 cursor-not-allowed shadow-none' 
+                      : 'bg-[#212349] hover:bg-[#2c2f61] shadow-[#212349]/20'}`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  {actionLoading ? t('event_detail.processing') : event.isRegistrationClosed ? t('event_detail.registration_closed') : event.isFull ? t('event_detail.full') : t('event_detail.register_now')}
+                </button>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

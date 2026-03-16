@@ -1,100 +1,134 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../api/axios';
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation();
   const { token } = useParams();
   const navigate = useNavigate();
-
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 6) {
-      setMessage({ type: 'error', text: 'Şifre en az 6 karakter olmalıdır.' });
-      return;
-    }
     if (password !== confirmPassword) {
-      setMessage({ type: 'error', text: 'Şifreler eşleşmiyor.' });
+      setError(t('register.errors.passwordMatch'));
       return;
     }
-    
     setLoading(true);
-    setMessage({ type: '', text: '' });
-    
     try {
       await api.post(`/auth/reset-password/${token}`, { password });
-      setMessage({ type: 'success', text: 'Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...' });
-      setTimeout(() => {
-        navigate('/login', { state: { message: 'Şifreniz güncellendi. Yeni şifrenizle giriş yapabilirsiniz.' } });
-      }, 2500);
+      setMessage(t('recovery.resetSuccess'));
+      setTimeout(() => navigate('/login', { state: { message: t('recovery.loginRedirect') } }), 3000);
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'Sıfırlama işlemi başarısız. Bağlantı süresi dolmuş olabilir.' });
+      setError(err.response?.data?.message || t('recovery.error'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-8">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold text-slate-800">Yeni Şifre Belirle</h1>
-          <p className="text-slate-500 mt-1">Lütfen yeni şifrenizi girin.</p>
-        </div>
+    <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-slate-900 font-inter">
+      {/* Background Image */}
+      <img src="/erciyes-bg.png" className="fixed inset-0 w-full h-full object-cover z-0 opacity-90" alt="" />
+      
 
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
-          {message.text && (
-            <div className={`mb-6 p-3 rounded-xl text-sm text-center font-medium ${
-              message.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-red-50 border border-red-200 text-red-600'
-            }`}>
-              {message.text}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Yeni Şifre</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="En az 6 karakter"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              />
-            </div>
+      <div className="flex-grow w-full flex items-center justify-center relative z-10 py-12 px-4">
+        <div className="w-full max-w-[440px]">
+          
+          <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.4)] relative border border-white/20">
             
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Yeni Şifre (Tekrar)</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              />
+            {/* Logo */}
+            <div className="flex justify-center mb-8 text-center">
+               <div>
+                <div className="w-20 h-20 bg-white rounded-2xl p-2.5 shadow-sm border border-slate-50 flex items-center justify-center mx-auto mb-6">
+                  <img src="/golden_logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+                </div>
+                <h1 className="text-xl font-black text-slate-800 tracking-tight leading-tight mb-2 uppercase">
+                  {t('recovery.resetTitle')}
+                </h1>
+                <p className="text-slate-400 text-[10px] font-medium italic">
+                  {t('recovery.resetSubtitle')}
+                </p>
+               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading || !password || !confirmPassword || message.type === 'success'}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-60 mt-2"
-            >
-              {loading ? 'Güncelleniyor...' : 'Şifremi Güncelle'}
-            </button>
-          </form>
+            {message && (
+              <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-bold text-center border border-emerald-100">{message}</div>
+            )}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold text-center border border-red-100">{error}</div>
+            )}
 
-          <p className="text-center text-sm text-slate-500 mt-6">
-            <Link to="/login" className="text-blue-600 font-semibold hover:underline">← Giriş Sayfasına Dön</Link>
-          </p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('login.password')}</label>
+                <div className="relative group">
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder={t('register.passwordPlaceholder')}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-800 placeholder-slate-500 text-sm font-semibold focus:outline-none focus:border-blue-200 transition-all shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('register.passwordPlaceholder')}</label>
+                <div className="relative group">
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder={t('register.passwordPlaceholder')}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-800 placeholder-slate-500 text-sm font-semibold focus:outline-none focus:border-blue-200 transition-all shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 bg-[#212349] text-white text-[15px] font-black uppercase tracking-[0.25em] rounded-xl shadow-[0_10px_30px_rgba(33,35,73,0.3)] hover:bg-[#2c2f61] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 mt-4"
+              >
+                {loading ? t('recovery.loading') : t('recovery.resetTitle')}
+              </button>
+            </form>
+
+            <div className="mt-10 text-center">
+              <Link to="/login" className="text-[10px] font-black text-blue-500 hover:text-blue-600 transition-all uppercase tracking-widest flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
+                {t('recovery.back')}
+              </Link>
+            </div>
+
+          </div>
         </div>
       </div>
+
+      {/* Design Credits */}
+      <footer className="fixed bottom-6 left-6 z-20 pointer-events-auto">
+         <span className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em] drop-shadow-sm">
+           {t('login.footer')} <span className="text-white font-black">ABDULLAH ENES OTLU</span>
+         </span>
+      </footer>
     </div>
   );
 }
