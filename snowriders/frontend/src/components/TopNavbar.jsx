@@ -75,7 +75,7 @@ export default function TopNavbar() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-slate-100 hover:bg-slate-200 transition-all border border-slate-200"
           >
-            <div className="w-8 h-8 rounded-full bg-[#6366f1] flex items-center justify-center text-white text-[11px] font-bold overflow-hidden border border-white shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[11px] font-bold overflow-hidden border-2 border-[#D4AF37]/50 shadow-sm">
               {user?.profileImage ? (
                 <img src={`http://localhost:5000${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (

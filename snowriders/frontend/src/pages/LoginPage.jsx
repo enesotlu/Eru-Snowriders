@@ -91,8 +91,8 @@ export default function LoginPage() {
             
             {/* Logo */}
             <div className="flex justify-center mb-8">
-              <div className="w-20 h-20 bg-white rounded-2xl p-2.5 shadow-sm border border-slate-50 flex items-center justify-center">
-                <img src="/golden_logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+              <div className="w-24 h-24 bg-white rounded-full p-1 shadow-xl border-2 border-[#D4AF37]/20 transition-transform hover:scale-105 duration-500 flex items-center justify-center overflow-hidden">
+                <img src="/club-logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
               </div>
             </div>
 

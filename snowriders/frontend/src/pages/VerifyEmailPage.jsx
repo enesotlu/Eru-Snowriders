@@ -112,8 +112,8 @@ export default function VerifyEmailPage() {
             
             <div className="text-center mb-10">
               <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-white rounded-3xl p-2.5 shadow-sm border border-slate-50 flex items-center justify-center">
-                  <img src="/golden_logo.jpg" alt="Logo" className="w-full h-full object-contain mix-blend-multiply opacity-90" />
+                <div className="w-20 h-20 bg-white rounded-full p-1 shadow-lg border-2 border-[#D4AF37]/20 flex items-center justify-center mx-auto mb-8 overflow-hidden">
+                  <img src="/club-logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
                 </div>
               </div>
               <h1 className="text-2xl font-bold text-slate-800 tracking-tight uppercase mb-2">

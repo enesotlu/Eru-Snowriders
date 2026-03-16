@@ -50,15 +50,17 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-72 h-[calc(100vh-2rem)] my-4 ml-4 rounded-[2.5rem] py-12 px-8 shrink-0 transition-all duration-500 relative z-50 overflow-hidden bg-[#f1f5f9] border border-slate-100 shadow-sm">
       
       {/* Brand / Logo */}
-      <Link to="/dashboard" className="relative z-10 flex flex-col items-center gap-4 px-2 mb-16 group no-underline text-center">
-        <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center shrink-0 border border-slate-100 group-hover:scale-105 transition-all duration-700 shadow-sm">
-          <img src="/golden_logo.jpg" alt="Logo" className="w-10 h-10 rounded-xl object-contain" />
-        </div>
-        <div>
-          <span className="block font-black text-slate-900 tracking-tighter leading-none text-xl font-archivo uppercase">ERU KAYAK</span>
-          <span className="block font-black text-[0.65rem] text-slate-500 tracking-[0.4em] uppercase mt-2">SNOWBOARD</span>
-        </div>
-      </Link>
+      <Link to="/dashboard" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shrink-0 border-2 border-[#D4AF37]/30 group-hover:scale-110 group-hover:border-[#D4AF37] transition-all duration-500 shadow-md overflow-hidden p-0.5">
+                <img src="/club-logo.jpg" alt="Logo" className="w-full h-full rounded-full object-cover" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black text-[#1A2B3C] text-sm leading-none tracking-tighter uppercase italic">
+                ERÜ <span className="text-[#D4AF37]">KAYAK & SNOWBOARD</span>
+              </span>
+              <span className="text-[8px] font-bold text-[#1A2B3C]/40 uppercase tracking-[0.2em] mt-0.5 italic">Kulübü</span>
+            </div>
+          </Link>
 
       {/* Navigation */}
       <nav className="relative z-10 flex-1 space-y-2">
@@ -72,11 +74,11 @@ export default function Sidebar() {
               to={item.path} 
               className={`group flex items-center gap-5 px-6 py-4 rounded-2xl transition-all duration-300 text-[11px] font-black uppercase tracking-[0.2em] ${
                 active
-                  ? 'bg-white text-blue-700 shadow-sm border border-slate-100'
+                  ? 'bg-white text-[#D4AF37] shadow-sm border border-[#D4AF37]/20'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
             }`}
           >
-            <span className={`transition-all duration-300 ${active ? 'text-blue-700' : 'text-slate-500 group-hover:text-slate-700'}`}>
+            <span className={`transition-all duration-300 ${active ? 'text-[#D4AF37]' : 'text-slate-500 group-hover:text-[#D4AF37]'}`}>
                 {item.icon}
               </span>
               {item.name}

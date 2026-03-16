@@ -55,12 +55,12 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 border border-white/60 group-hover:scale-110 group-hover:bg-[#00A8E8] group-hover:text-white transition-all duration-500 shadow-sm overflow-hidden">
-                <img src="/golden_logo.jpg" alt="Logo" className="w-7 h-7 object-cover mix-blend-multiply opacity-90 group-hover:invert group-hover:brightness-0 group-hover:contrast-200" />
+            <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shrink-0 border-2 border-[#D4AF37]/30 group-hover:scale-110 group-hover:border-[#D4AF37] transition-all duration-500 shadow-md overflow-hidden p-0.5">
+                <img src="/club-logo.jpg" alt="Logo" className="w-full h-full rounded-full object-cover" />
             </div>
             <div className="flex flex-col">
               <span className="font-black text-[#1A2B3C] text-sm leading-none tracking-tighter uppercase italic">
-                ERÜ <span className="text-[#00A8E8]">KAYAK & SNOWBOARD</span>
+                ERÜ <span className="text-[#D4AF37]">KAYAK & SNOWBOARD</span>
               </span>
               <span className="text-[8px] font-bold text-[#1A2B3C]/40 uppercase tracking-[0.2em] mt-0.5 italic">Kulübü</span>
             </div>

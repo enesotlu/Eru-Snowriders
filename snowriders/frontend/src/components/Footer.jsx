@@ -7,7 +7,11 @@ export default function Footer() {
         
         {/* Left Side - ESN Style Logo / Texts */}
         <div className="flex items-center gap-3">
-          <img src="/golden_logo.jpg" alt="ERU Kayak & Snowboard Kulübü Logo" className="w-10 h-10 rounded-full shadow-sm border border-slate-100 object-cover" />
+            <div className="flex justify-center mb-8">
+              <div className="w-24 h-24 bg-white rounded-full p-1 shadow-xl border-2 border-[#D4AF37]/20 transition-transform hover:scale-105 duration-500 flex items-center justify-center overflow-hidden">
+                <img src="/club-logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
+              </div>
+            </div>
           <div className="flex flex-col">
             <span className="font-extrabold text-slate-900 tracking-tight leading-tight">ERU Kayak & Snowboard Kulübü</span>
             <span className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest">This platform is made by Abdullah Enes Otlu</span>

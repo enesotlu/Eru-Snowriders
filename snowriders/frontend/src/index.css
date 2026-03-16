@@ -6,7 +6,9 @@
   :root {
     /* Pure Minimalist Palette */
     --brand-primary: #1e3a8a;
+    --brand-gold: #D4AF37;
     --brand-primary-soft: rgba(30, 58, 138, 0.05);
+    --brand-gold-soft: rgba(212, 175, 55, 0.1);
     
     --text-main: #0f172a;
     --text-muted: #475569;
@@ -81,8 +83,12 @@
   }
 
   .btn-primary:hover {
-    @apply bg-[#152e6d] -translate-y-0.5 scale-[1.02];
-    box-shadow: 0 15px 40px rgba(30, 58, 138, 0.2);
+    @apply bg-[#152e6d] -translate-y-0.5 scale-[1.02] border-[#D4AF37]/50 border;
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
+  }
+
+  .btn-gold {
+    @apply bg-[#D4AF37] text-white font-bold transition-all duration-300 px-6 py-2.5 rounded-xl hover:bg-[#c19b2e] shadow-lg;
   }
 
   .btn-secondary {
