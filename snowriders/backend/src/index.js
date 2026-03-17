@@ -67,7 +67,7 @@ const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB bağlantısı başarılı');
-    app.listen(PORT, () => console.log(`🚀 Sunucu http://localhost:${PORT} adresinde çalışıyor`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Sunucu http://localhost:${PORT} adresinde çalışıyor`));
   })
   .catch(err => {
     console.error('❌ MongoDB bağlantı hatası:', err.message);
