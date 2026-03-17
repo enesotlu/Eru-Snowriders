@@ -147,7 +147,9 @@ const resources = {
         "resetTitle": "Şifrenizi Güncelleyin",
         "resetSubtitle": "Yeni şifrenizi belirleyin",
         "resetSuccess": "Şifreniz güncellendi.",
-        "loginRedirect": "Yeni şifrenizle giriş yapabilirsiniz."
+        "loginRedirect": "Yeni şifrenizle giriş yapabilirsiniz.",
+        "newPasswordLabel": "YENİ ŞİFRE",
+        "confirmPasswordLabel": "YENİ ŞİFRE (TEKRAR)"
       },
       "verify": {
         "title": "Hesap Doğrulama",
@@ -411,7 +413,9 @@ const resources = {
         "resetTitle": "Set New Password",
         "resetSubtitle": "Enter your new credentials",
         "resetSuccess": "Password updated successfully.",
-        "loginRedirect": "You can now log in."
+        "loginRedirect": "You can now log in.",
+        "newPasswordLabel": "New Password",
+        "confirmPasswordLabel": "Confirm New Password"
       },
       "verify": {
         "title": "Verify Account",

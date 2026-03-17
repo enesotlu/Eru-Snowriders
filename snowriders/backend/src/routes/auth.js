@@ -98,8 +98,8 @@ router.post('/register', [
       email // frontend /verify sayfasına iletecek
     });
   } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    console.error('Register error details:', error);
+    res.status(500).json({ success: false, message: 'Sunucu hatası', error: error.message });
   }
 });
 
@@ -171,7 +171,7 @@ router.post('/resend-code', [
     console.log('\n==============================\n🔑 YENİ OTP KODU:', verificationCode, '\n==============================\n');
     
     // Doğrulama mailini arka planda asenkron gönder
-    sendVerificationEmail(email, verificationCode).catch(err => console.error(err));
+    emailUtils.sendVerificationEmail(email, verificationCode).catch(err => console.error('Resend code email error:', err));
     res.json({ success: true, message: 'Yeni doğrulama kodu gönderildi.' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Sunucu hatası' });
@@ -296,11 +296,15 @@ router.post('/forgot-password', [
     // Şifre sıfırlama maili gönder
     console.log(`\n==============================\n📧 RESET TOKEN: ${resetToken}\n==============================\n`);
     
-    await emailUtils.sendPasswordResetEmail(user.email, resetUrl);
+    const emailSent = await emailUtils.sendPasswordResetEmail(user.email, resetUrl);
+    if (!emailSent) {
+      return res.status(500).json({ success: false, message: 'E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.' });
+    }
 
     res.json({ success: true, message: 'Şifre sıfırlama bağlantısı emailinize gönderildi.' });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Sunucu hatası' });
+    console.error('Forgot password error details:', err.stack);
+    res.status(500).json({ success: false, message: 'Sunucu hatası', error: err.message });
   }
 });
 

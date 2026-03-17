@@ -42,10 +42,10 @@ const sendVerificationEmail = async (to, code) => {
     const textResult = await response.text();
     console.log(`[Email] GAS Yanıtı (Status ${response.status}): ${textResult.substring(0, 100)}`);
     
-    if (response.ok || response.type === 'opaque') {
+    if (response.ok) {
       return true;
     } else {
-      console.error('GAS Webhook Hatası: İstek başarısız oldu (Status:', response.status, ')');
+      console.error(`GAS Webhook Hatası: İstek başarısız oldu (Status: ${response.status}, Yanıt: ${textResult})`);
       return false;
     }
   } catch (error) {
@@ -95,10 +95,10 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
     const textResult = await response.text();
     console.log(`[Email] GAS Yanıtı (Reset): ${textResult.substring(0, 100)}`);
 
-    if (response.ok || response.type === 'opaque') {
+    if (response.ok) {
       return true;
     } else {
-      console.error('GAS Webhook Hatası (Reset Password): İstek başarısız (Status:', response.status, ')');
+      console.error(`GAS Webhook Hatası (Reset Password): İstek başarısız (Status: ${response.status}, Yanıt: ${textResult})`);
       return false;
     }
   } catch (error) {

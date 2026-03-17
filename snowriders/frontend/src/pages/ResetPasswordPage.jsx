@@ -15,6 +15,10 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password.length < 6) {
+      setError(t('register.errors.passwordLength'));
+      return;
+    }
     if (password !== confirmPassword) {
       setError(t('register.errors.passwordMatch'));
       return;
@@ -66,7 +70,7 @@ export default function ResetPasswordPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('login.password')}</label>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('recovery.newPasswordLabel')}</label>
                 <div className="relative group">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -85,7 +89,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('register.passwordPlaceholder')}</label>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('recovery.confirmPasswordLabel')}</label>
                 <div className="relative group">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
