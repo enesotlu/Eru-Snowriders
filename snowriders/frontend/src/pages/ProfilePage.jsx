@@ -68,6 +68,22 @@ export default function ProfilePage() {
     }
   };
 
+  const handleImageDelete = async () => {
+    if (!profile.profileImage) return;
+    
+    setLoading(true);
+    try {
+      const { data } = await api.delete('/users/profile-image');
+      setProfile(data.user);
+      updateUser({ profileImage: '' });
+      setMessage({ type: 'success', text: 'Profil fotoğrafı kaldırıldı' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Fotoğraf silinemedi' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getInitials = (name, surname) => {
     if (!name && !surname) return '👤';
     return `${name?.charAt(0) || ''}${surname?.charAt(0) || ''}`.toUpperCase();
@@ -107,14 +123,26 @@ export default function ProfilePage() {
               </div>
             </div>
             
-            <label className="absolute bottom-2 right-2 w-12 h-12 bg-slate-800 text-white rounded-2xl flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 active:scale-90 transition-all border-4 border-white group-hover/avatar:bg-blue-600">
-               <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={loading} />
-               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </label>
+            <div className="absolute -bottom-2 -right-2 flex gap-1.5">
+              {profile.profileImage && (
+                <button 
+                  onClick={handleImageDelete}
+                  disabled={loading}
+                  className="w-9 h-9 bg-red-500 text-white rounded-xl flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 active:scale-95 transition-all border-[3px] border-white hover:bg-red-600"
+                  title="Fotoğrafı Kaldır"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              )}
+              <label className="w-9 h-9 bg-slate-800 text-white rounded-xl flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 active:scale-95 transition-all border-[3px] border-white group-hover/avatar:bg-blue-600">
+                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={loading} />
+                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </label>
+            </div>
           </div>
           
           <div className="flex-1 text-center md:text-left pt-6 md:pt-0">
-            <h1 className="text-4xl font-black text-slate-800 tracking-tighter mb-4 uppercase">
+            <h1 className="text-4xl font-black text-slate-800 tracking-tighter mb-4">
               {profile.name} {profile.surname}
             </h1>
             <p className="text-slate-500 font-bold text-[13px] tracking-tight">{profile.email}</p>
@@ -141,7 +169,7 @@ export default function ProfilePage() {
                <div className="space-y-8">
                   <div>
                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">{t('profile.joinDate')}</p>
-                     <p className="text-[15px] font-black text-slate-800 mt-3 uppercase tracking-tight">
+                     <p className="text-[15px] font-black text-slate-800 mt-3 tracking-tight">
                         {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : '...'}
                      </p>
                   </div>
@@ -179,7 +207,7 @@ export default function ProfilePage() {
                        <input 
                          value={form.name} 
                          onChange={e => setForm({...form, name: e.target.value})}
-                         className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all uppercase tracking-tight" 
+                         className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all tracking-tight" 
                        />
                      </div>
                      <div className="space-y-4">
@@ -187,10 +215,10 @@ export default function ProfilePage() {
                        <input 
                          value={form.surname} 
                          onChange={e => setForm({...form, surname: e.target.value})}
-                         className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all uppercase tracking-tight" 
+                         className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all tracking-tight" 
                        />
-                    </div>
-                  </div>
+                     </div>
+                   </div>
 
                    <div className="space-y-4">
                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em] ml-2">{t('register.department')}</label>
@@ -198,11 +226,11 @@ export default function ProfilePage() {
                        value={form.department} 
                        onChange={e => setForm({...form, department: e.target.value})}
                        placeholder={t('register.deptSelect')}
-                       className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all uppercase tracking-tight"
+                       className="w-full px-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-800 font-black text-[13px] focus:outline-none focus:border-blue-500 transition-all tracking-tight"
                      />
-                  </div>
+                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-6 pt-10">
+                   <div className="flex flex-col sm:flex-row gap-6 pt-10">
                      <button 
                        type="submit" 
                        disabled={loading}
@@ -217,7 +245,7 @@ export default function ProfilePage() {
                      >
                        {t('profile.cancelButton')}
                      </button>
-                  </div>
+                   </div>
                 </form>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
@@ -229,7 +257,7 @@ export default function ProfilePage() {
                    ].map((field) => (
                      <div key={field.label} className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100 hover:bg-white hover:border-blue-500/20 shadow-sm transition-all group scale-100 hover:scale-[1.02] duration-500">
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 leading-none">{field.label}</p>
-                        <p className={`text-[16px] font-black text-slate-800 truncate tracking-tight ${field.label === t('profile.email') ? '' : 'uppercase'} leading-none mt-2`}>{field.val}</p>
+                        <p className="text-[16px] font-black text-slate-800 truncate tracking-tight leading-none mt-2">{field.val}</p>
                      </div>
                   ))}
                 </div>

@@ -4,6 +4,7 @@ const { protect } = require('../middleware/auth');
 const User = require('../models/User');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ const upload = multer({
   }
 });
 
-// POST /api/users/profile-image
+// POST /api/users/profile-image — profil fotoğrafı yükle/güncelle
 router.post('/profile-image', protect, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -37,8 +38,33 @@ router.post('/profile-image', protect, upload.single('image'), async (req, res) 
     const imagePath = `/src/uploads/profile-images/${req.file.filename}`;
     const user = await User.findByIdAndUpdate(req.user._id, { profileImage: imagePath }, { new: true });
     
-    res.json({ success: true, user });
+    res.json({ success: true, user, message: 'Profil fotoğrafı güncellendi' });
   } catch (error) {
+    res.status(500).json({ success: false, message: 'Sunucu hatası' });
+  }
+});
+
+// DELETE /api/users/profile-image — profil fotoğrafını sil
+router.delete('/profile-image', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user || !user.profileImage) {
+      return res.status(400).json({ success: false, message: 'Silinecek fotoğraf bulunamadı' });
+    }
+
+    // Dosyayı sistemden sil
+    const filePath = path.join(__dirname, '../..', user.profileImage);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Veritabanını güncelle
+    user.profileImage = '';
+    await user.save();
+
+    res.json({ success: true, user, message: 'Profil fotoğrafı başarıyla kaldırıldı' });
+  } catch (error) {
+    console.error('Delete image error:', error);
     res.status(500).json({ success: false, message: 'Sunucu hatası' });
   }
 });

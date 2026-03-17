@@ -35,6 +35,8 @@ export default function TopNavbar() {
     return `${name?.charAt(0) || ''}${surname?.charAt(0) || ''}`.toUpperCase();
   };
 
+  const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5005';
+
   return (
     <nav className="h-20 px-10 flex items-center justify-between bg-transparent sticky top-0 z-[60]">
       
@@ -77,7 +79,7 @@ export default function TopNavbar() {
           >
             <div className="w-8 h-8 rounded-full bg-[#1e3a8a] flex items-center justify-center text-white text-[11px] font-bold overflow-hidden border-2 border-[#D4AF37]/50 shadow-sm">
               {user?.profileImage ? (
-                <img src={`http://localhost:5000${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${backendUrl}${user.profileImage}`} alt="" className="w-full h-full object-cover" />
               ) : (
                 getInitials(user?.name, user?.surname)
               )}
