@@ -76,7 +76,7 @@ const sendPasswordResetEmail = async (to, resetUrl) => {
         <div style="text-align: center; margin: 30px 0;">
           <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Şifremi Sıfırla</a>
         </div>
-        <p style="color: #64748b; font-size: 14px; text-align: center;">Bu bağlantı 15 dakika süresince geçerlidir.</p>
+        <p style="color: #64748b; font-size: 14px; text-align: center;">Bu bağlantı 5 dakika süresince geçerlidir.</p>
       </div>
     `;
 

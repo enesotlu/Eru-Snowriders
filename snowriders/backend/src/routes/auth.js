@@ -285,7 +285,7 @@ router.post('/forgot-password', [
     // Rastgele token oluştur
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 dk
+    user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 dk
 
     await user.save();
 
