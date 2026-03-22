@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.PROD 
+    ? 'https://eru-snowriders.onrender.com/api' 
+    : (import.meta.env.VITE_API_URL || '/api'),
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000, // 30 saniye (Google Apps Script için daha uzun süre)
+  timeout: 30000, // 30 saniye
 });
 
 // Attach JWT token to every request

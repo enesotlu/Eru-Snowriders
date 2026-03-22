@@ -44,6 +44,29 @@ Developed a custom localization solution using `i18next`, allowing the entire pl
 ### 4. Admin Command Center
 Built a centralized dashboard where administrators can manage events, monitor participant lists in real-time, and trigger system-wide updates through a Floating Action Button (FAB) interface.
 
+## 📂 Project Structure
+
+A modular monorepo architecture ensuring separation of concerns between client and server.
+
+```text
+.
+├── snowriders/
+│   ├── frontend/             # React SPA (Vite)
+│   │   ├── src/
+│   │   │   ├── components/   # Reusable UI components
+│   │   │   ├── context/      # Global state (Auth)
+│   │   │   ├── pages/        # Main route views
+│   │   │   └── ...
+│   ├── backend/              # Express API
+│   │   ├── src/
+│   │   │   ├── models/       # Mongoose Schemas (User, Event)
+│   │   │   ├── routes/       # API Endpoint definitions
+│   │   │   ├── utils/        # Helpers (Email, Auth, Maps)
+│   │   │   └── index.js      # Server entry point
+├── LICENSE                   # MIT License
+└── README.md                 # Project documentation
+```
+
 ## ⚙️ Local Development
 
 1. **Clone & Install**:

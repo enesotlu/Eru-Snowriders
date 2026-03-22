@@ -213,22 +213,22 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Desktop Footer (Bottom Left) - Hidden on mobile */}
+      {/* Desktop Footer (Bottom Left) - Force Hidden on mobile */}
       <div className="hidden md:flex fixed bottom-6 left-6 z-20 items-center gap-3 pointer-events-auto">
         <div className="flex items-center gap-2 text-white drop-shadow-md">
           <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-60">THIS PLATFORM IS MADE BY</span>
           <span className="text-[11px] font-black uppercase tracking-widest">ABDULLAH ENES OTLU</span>
         </div>
         <div className="w-[1px] h-4 bg-white/20"></div>
-        <a href="https://www.linkedin.com/in/abdullah-enes-otlu-075305299" target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-300 hover:scale-110 transition-all transition-transform">
+        <a href="https://www.linkedin.com/in/abdullah-enes-otlu-075305299" target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-300 hover:scale-110 transition-all">
           <svg className="w-5 h-5 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.238 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
         </a>
       </div>
 
-      {/* Follow Us Section (Bottom Right) - Hidden on mobile */}
+      {/* Follow Us Section (Bottom Right) - Force Hidden on mobile */}
       <div className="hidden md:flex fixed bottom-6 right-6 z-20 flex flex-col items-end pointer-events-auto">
         <p className="text-[9px] font-black text-white uppercase tracking-[0.2em] mb-2 drop-shadow-md">FOLLOW US</p>
-        <a href="https://www.instagram.com/erusnowriders/" target="_blank" rel="noopener noreferrer" className="inline-flex p-3 bg-gradient-to-tr from-orange-500 to-pink-500 text-white rounded-2xl shadow-xl hover:scale-110 transition-transform">
+        <a href="https://www.instagram.com/erusnowriders/" target="_blank" rel="noopener noreferrer" className="inline-flex p-3 bg-gradient-to-tr from-orange-500 to-pink-500 text-white rounded-2xl shadow-xl hover:scale-110 transition-all">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.054 1.805.249 2.227.412.56.216.96.474 1.38.894.42.42.678.82.894 1.38.163.422.358 1.057.412 2.227.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.054 1.17-.249 1.805-.412 2.227-.216.56-.474.96-.894 1.38-.42.42-.82.678-1.38.894-.422.163-1.057.358-2.227.412-1.266.058-1.646.07-4.85.07zM12 0C8.741 0 8.333.014 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126s1.358 1.078 2.126 1.384c.766.296 1.636.499 2.913.558C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384s1.078-1.358 1.384-2.126c.296-.765.499-1.636.558-2.913.058-1.28.072-1.687.072-4.947s-.014-3.667-.072-4.947c-.06-1.277-.262-2.148-.558-2.913-.306-.789-.718-1.459-1.384-2.126s-1.358-1.078-2.126-1.384c-.765-.296-1.636-.499-2.913-.558C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16.4a4.4 4.4 0 110-8.8 4.4 4.4 0 010 8.8zm6.406-11.845a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" /></svg>
         </a>
       </div>
