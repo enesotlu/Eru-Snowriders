@@ -198,16 +198,8 @@ router.post('/login', [
       return res.status(401).json({ success: false, message: 'Email veya şifre hatalı' });
     }
 
-    // Admin kullanıcılar kendi endpoint'inden girsin
-    if (user.role === 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Admin girişi için lütfen Admin Girişi sekmesini kullanın'
-      });
-    }
-
-    // Email doğrulama kontrolü
-    if (!user.isVerified) {
+    // Email doğrulama kontrolü (Adminler için bu kontrolü atla)
+    if (!user.isVerified && user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Lütfen önce hesabınızı doğrulayın. Email adresinize gönderilen kodu girin.',
