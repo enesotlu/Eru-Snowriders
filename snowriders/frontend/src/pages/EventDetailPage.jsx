@@ -144,9 +144,9 @@ export default function EventDetailPage() {
                 <div className={`w-16 h-16 rounded-2xl ${theme.lightBg} flex items-center justify-center ${theme.text} shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z" /></svg>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                     <p className={`text-[12px] font-black ${theme.text} uppercase tracking-widest leading-none mb-3 opacity-70`}>{t('event_detail.location')}</p>
-                    <h3 className={`text-2xl font-black ${theme.text} tracking-tight uppercase leading-none truncate`}>
+                    <h3 className={`text-lg md:text-2xl font-black ${theme.text} tracking-tight uppercase leading-tight break-words`}>
                       {getLocationTitle(event.location) || t('event_detail.open_map')}
                     </h3>
                 </div>
@@ -159,9 +159,9 @@ export default function EventDetailPage() {
                     <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">{t('event_detail.location')}</p>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase leading-none truncate">
+                    <h3 className="text-lg md:text-2xl font-black text-slate-900 tracking-tight uppercase leading-tight break-words">
                       {event.location || 'Erciyes'}
                     </h3>
                 </div>
@@ -201,20 +201,7 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          {/* Registration Deadline Warning */}
-          {!event.isPast && event.registrationDeadline && !event.isRegistered && (
-            <div className="bg-red-50/80 rounded-[2rem] p-8 border border-red-100 flex items-center gap-6 shadow-sm mb-12">
-               <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-sm border border-red-100">
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-               </div>
-               <div>
-                 <p className="text-[11px] font-black text-red-500 uppercase tracking-[0.2em] leading-none mb-3">{t('event_detail.last_chance')}</p>
-                 <p className="text-xl font-black text-red-900 uppercase tracking-tight">
-                    {new Date(event.registrationDeadline).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
-                 </p>
-               </div>
-            </div>
-          )}
+
 
           {/* Description Section */}
           <div className="space-y-8 bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100/50 mb-12">
