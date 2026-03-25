@@ -10,6 +10,18 @@ const registrationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Event',
     required: true
+  },
+  rating: {
+    type: Number,
+    min: [1, 'Puan en az 1 olabilir'],
+    max: [5, 'Puan en fazla 5 olabilir']
+  },
+  comment: {
+    type: String,
+    maxLength: [1000, 'Yorum çok uzun']
+  },
+  evaluatedAt: {
+    type: Date
   }
 }, { timestamps: true });
 

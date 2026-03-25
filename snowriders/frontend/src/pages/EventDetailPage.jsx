@@ -13,6 +13,12 @@ export default function EventDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  
+  // Evaluation state
+  const [showEvalModal, setShowEvalModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [evalLoading, setEvalLoading] = useState(false);
 
   useEffect(() => {
     api.get(`/events/${id}`).then(res => { 
@@ -50,6 +56,20 @@ export default function EventDetailPage() {
     } catch (err) {
       setMessage({ type: 'error', text: err.response?.data?.message || t('event_detail.errors.failed_cancel') });
     } finally { setActionLoading(false); }
+  };
+
+  const handleEvaluate = async () => {
+    if (rating < 1 || rating > 5) return;
+    setEvalLoading(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const res = await api.post(`/events/${id}/evaluate`, { rating, comment });
+      setEvent(prev => ({ ...prev, userRating: rating, userComment: comment }));
+      setShowEvalModal(false);
+      setMessage({ type: 'success', text: res.data.message || t('event_detail.eval_success') });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.message || t('event_detail.eval_error') });
+    } finally { setEvalLoading(false); }
   };
 
   if (loading) return (
@@ -229,7 +249,29 @@ export default function EventDetailPage() {
           )}
 
           {/* Actions */}
-          {!event.isPast && (
+          {event.isPast ? (
+            event.isRegistered && (
+              <div className="pt-6">
+                {event.userRating ? (
+                  <div className="bg-emerald-50/50 rounded-[2.5rem] p-8 border border-emerald-100 flex flex-col items-center justify-center text-center gap-4">
+                    <p className="text-emerald-600 font-black text-sm uppercase tracking-widest">{t('event_detail.evaluated_event')}</p>
+                    <div className="flex items-center gap-1 text-emerald-500">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className={`w-6 h-6 ${i < event.userRating ? 'fill-current' : 'text-emerald-200 fill-current opacity-30'}`} viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setShowEvalModal(true)}
+                    className="w-full py-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-black tracking-widest rounded-[2.5rem] transition-all uppercase text-[12px] border border-blue-100 shadow-sm"
+                  >
+                    {t('event_detail.eval_submit')}
+                  </button>
+                )}
+              </div>
+            )
+          ) : (
             <div className="pt-6">
               {event.isRegistered ? (
                 cancelConfirm ? (
@@ -272,6 +314,66 @@ export default function EventDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Evaluation Modal */}
+      {showEvalModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="text-lg font-black text-slate-800 uppercase tracking-widest">{t('event_detail.eval_modal_title')}</h3>
+              <button onClick={() => setShowEvalModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-100">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-8">
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('event_detail.eval_rating')}</label>
+                <div className="flex items-center gap-2 justify-center py-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`transition-all hover:scale-110 active:scale-95 ${rating >= star ? 'text-yellow-400' : 'text-slate-200'}`}
+                    >
+                      <svg className="w-12 h-12 fill-current drop-shadow-sm" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('event_detail.eval_comment')}</label>
+                <textarea 
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 focus:bg-white transition-all resize-none font-medium h-32 break-words whitespace-pre-wrap"
+                  maxLength={1000}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-4">
+              <button 
+                onClick={() => setShowEvalModal(false)}
+                className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors text-sm"
+              >
+                {t('event_detail.eval_cancel')}
+              </button>
+              <button 
+                onClick={handleEvaluate}
+                disabled={rating === 0 || evalLoading}
+                className={`px-8 py-3 rounded-xl font-black text-white uppercase tracking-widest text-xs transition-all shadow-md ${rating === 0 || evalLoading ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5'}`}
+              >
+                {evalLoading ? 'Gönderiliyor...' : 'Gönder'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -117,20 +117,24 @@ router.get('/events', async (req, res) => {
   }
 });
 
-// GET /api/admin/events/:id/registrations — kayıt olan kişiler (Event.registeredUsers üzerinden)
+// GET /api/admin/events/:id/registrations — kayıt olan kişiler (ile değerlendirmeleri)
 router.get('/events/:id/registrations', async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id)
-      .populate('registeredUsers', 'name surname studentNumber email department phone');
-    
+    const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ success: false, message: 'Etkinlik bulunamadı' });
 
-    // Populate sonucu bazen null dönebilir (kullanıcı silinmişse)
-    const users = event.registeredUsers
-      .filter(user => user !== null) // Silinmiş kullanıcıları temizle
-      .map(u => ({
-        ...u.toObject(),
-        registeredAt: u.createdAt // User modelindeki createdAt (asıl kayıt tarihi Registration'dadır ama bu da yakındır)
+    // Kayıtları Event yerine Registration modeli üzerinden çek, hem kullanıcı bilgisini hem eval bilgisini al
+    const registrations = await Registration.find({ eventId: req.params.id })
+      .populate('userId', 'name surname studentNumber email department phone createdAt');
+
+    const users = registrations
+      .filter(reg => reg.userId !== null) // Silinmiş kullanıcıları temizle
+      .map(reg => ({
+        ...reg.userId.toObject(),
+        registeredAt: reg.createdAt, // Gerçek kayıt tarihi
+        rating: reg.rating || null,
+        comment: reg.comment || '',
+        evaluatedAt: reg.evaluatedAt || null
       }));
 
     res.json({ success: true, users, total: users.length });
@@ -143,16 +147,21 @@ router.get('/events/:id/registrations', async (req, res) => {
 // GET /api/admin/events/:id/registrations/csv — katılımcıları CSV olarak indir
 router.get('/events/:id/registrations/csv', async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id)
-      .populate('registeredUsers', 'name surname studentNumber email department phone');
-      
+    const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ success: false, message: 'Etkinlik bulunamadı' });
 
-    const header = 'Ad,Soyad,Öğrenci No,Bölüm,Telefon,Email';
-    const rows = event.registeredUsers
-      .filter(u => u !== null)
-      .map(u => {
-        return `"${u.name || ''}","${u.surname || ''}","${u.studentNumber || ''}","${u.department || ''}","${u.phone || ''}","${u.email || ''}"`;
+    const registrations = await Registration.find({ eventId: req.params.id })
+      .populate('userId', 'name surname studentNumber email department phone');
+
+    const header = 'Ad,Soyad,Öğrenci No,Bölüm,Telefon,Email,Puan,Yorum';
+    const rows = registrations
+      .filter(reg => reg.userId !== null)
+      .map(reg => {
+        const u = reg.userId;
+        const rating = reg.rating ? reg.rating.toString() : '';
+        const comment = reg.comment ? reg.comment.replace(/"/g, '""') : '';
+        
+        return `"${u.name || ''}","${u.surname || ''}","${u.studentNumber || ''}","${u.department || ''}","${u.phone || ''}","${u.email || ''}","${rating}","${comment}"`;
       });
       
     const csv = [header, ...rows].join('\n');

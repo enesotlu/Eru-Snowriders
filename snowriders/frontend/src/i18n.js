@@ -218,7 +218,9 @@ const resources = {
              "name": "AD SOYAD",
              "id": "ÖĞRENCİ NO",
              "phone": "TELEFON",
-             "dept": "BÖLÜM"
+             "dept": "BÖLÜM",
+             "rating": "PUAN",
+             "comment": "YORUM"
           }
         },
         "members": {
@@ -259,7 +261,16 @@ const resources = {
         "errors": {
           "failed_register": "Kayıt işlemi başarısız oldu.",
           "failed_cancel": "İptal işlemi başarısız oldu."
-        }
+        },
+        "evaluate": "Etkinliği Değerlendir",
+        "eval_modal_title": "ETKİNLİĞİ DEĞERLENDİR",
+        "eval_rating": "PUANINIZ (1-5 YILDIZ)",
+        "eval_comment": "ÖNERİ VE GÖRÜŞLERİNİZ (İSTEĞE BAĞLI)",
+        "eval_submit": "GÖNDER",
+        "eval_cancel": "İptal",
+        "eval_success": "Yanıtınız için teşekkürler.",
+        "eval_error": "Değerlendirme gönderilemedi.",
+        "evaluated_event": "Bu etkinliği değerlendirdiniz"
       },
       "events": {
         "title": "Mevcut Etkinlikler",
@@ -485,7 +496,9 @@ const resources = {
              "name": "FULL NAME",
              "id": "STUDENT ID",
              "phone": "PHONE",
-             "dept": "DEPARTMENT"
+             "dept": "DEPARTMENT",
+             "rating": "RATING",
+             "comment": "COMMENT"
           }
         },
         "members": {
@@ -526,7 +539,16 @@ const resources = {
         "errors": {
           "failed_register": "Registration failed.",
           "failed_cancel": "Cancellation failed."
-        }
+        },
+        "evaluate": "Evaluate Event",
+        "eval_modal_title": "EVALUATE EVENT",
+        "eval_rating": "YOUR RATING (1-5 STARS)",
+        "eval_comment": "FEEDBACK & SUGGESTIONS (OPTIONAL)",
+        "eval_submit": "SUBMIT",
+        "eval_cancel": "Cancel",
+        "eval_success": "Thank you for your feedback.",
+        "eval_error": "Evaluation could not be submitted.",
+        "evaluated_event": "You have evaluated this event"
       },
       "events": {
         "title": "Available Events",
