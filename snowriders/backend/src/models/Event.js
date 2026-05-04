@@ -63,16 +63,20 @@ eventSchema.virtual('isFull').get(function() {
 
 // Sanal alan: tarih geçti mi?
 eventSchema.virtual('isPast').get(function() {
-  return new Date(this.date) < new Date();
+  const eventDate = new Date(this.date);
+  // Etkinliğin gün sonuna kadar 'past' olmamasını sağlıyoruz
+  eventDate.setHours(23, 59, 59, 999);
+  return eventDate < new Date();
 });
 
 // Sanal alan: kayıt kapandı mı?
 eventSchema.virtual('isRegistrationClosed').get(function() {
   if (!this.registrationDeadline) return false;
   
-  // Set the deadline to the end of the day (23:59:59.999) if no specific time is provided,
-  // or just compare directly. For simplicity, we compare directly.
-  return new Date(this.registrationDeadline) < new Date();
+  const deadline = new Date(this.registrationDeadline);
+  // Kayıt tarihinin gün sonuna kadar açık kalmasını sağlıyoruz
+  deadline.setHours(23, 59, 59, 999);
+  return deadline < new Date();
 });
 
 eventSchema.set('toJSON', { virtuals: true });

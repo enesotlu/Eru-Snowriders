@@ -64,12 +64,12 @@ router.post('/:id/register', protect, async (req, res) => {
     if (!event) return res.status(404).json({ success: false, message: 'Etkinlik bulunamadı' });
 
     // Tarih geçmiş mi?
-    if (new Date(event.date) < new Date()) {
+    if (event.isPast) {
       return res.status(400).json({ success: false, message: 'Bu etkinliğin tarihi geçmiş, kayıt yapılamaz' });
     }
 
     // Son kayıt tarihi geçmiş mi?
-    if (event.registrationDeadline && new Date(event.registrationDeadline) < new Date()) {
+    if (event.isRegistrationClosed) {
       return res.status(400).json({ success: false, message: 'Son kayıt tarihi geçmiştir. Kayıt kilitlendi.' });
     }
 
@@ -108,7 +108,7 @@ router.delete('/:id/register', protect, async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ success: false, message: 'Etkinlik bulunamadı' });
 
-    if (new Date(event.date) < new Date()) {
+    if (event.isPast) {
       return res.status(400).json({ success: false, message: 'Tarihi geçmiş etkinlikten çıkılamaz' });
     }
 
@@ -138,7 +138,7 @@ router.post('/:id/evaluate', protect, async (req, res) => {
     if (!event) return res.status(404).json({ success: false, message: 'Etkinlik bulunamadı' });
 
     // Etkinlik tarihi geçmiş mi? Sadece geçmiş etkinlikler değerlendirilebilir (isteğe bağlı ama mantıklı olan bu)
-    if (new Date(event.date) >= new Date()) {
+    if (!event.isPast) {
       return res.status(400).json({ success: false, message: 'Henüz gerçekleşmemiş bir etkinliği değerlendiremezsiniz.' });
     }
 
