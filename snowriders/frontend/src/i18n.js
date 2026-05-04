@@ -167,7 +167,8 @@ const resources = {
         "button": "Doğrula",
         "back": "Girişe Dön",
         "noCode": "Kod ulaşmadı mı?",
-        "loginRedirect": "Hesabınız aktifleşti. Giriş yapabilirsiniz."
+        "loginRedirect": "Hesabınız aktifleşti. Giriş yapabilirsiniz.",
+        "needsVerification": "Lütfen önce hesabınızı doğrulayın. Email adresinize gönderilen kodu girin."
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -445,7 +446,8 @@ const resources = {
         "button": "Verify",
         "back": "Back to Login",
         "noCode": "No code received?",
-        "loginRedirect": "Account verified. You may sign in."
+        "loginRedirect": "Account verified. You may sign in.",
+        "needsVerification": "Please verify your account first. Enter the code sent to your email address."
       },
       "admin": {
         "title": "Admin Dashboard",

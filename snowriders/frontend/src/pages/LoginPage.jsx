@@ -32,6 +32,15 @@ export default function LoginPage() {
         navigate('/dashboard');
       }
     } catch (err) {
+      if (err.response?.data?.needsVerification) {
+        navigate('/verify', {
+          state: {
+            email: err.response.data.email,
+            message: 'needsVerification'
+          }
+        });
+        return;
+      }
       setError(err.response?.data?.message || t('login.errors.failed'));
     } finally {
       setLoading(false);

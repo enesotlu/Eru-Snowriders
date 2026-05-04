@@ -146,7 +146,7 @@ export default function VerifyEmailPage() {
 
             {serverError && (
               <div className="mb-10 p-5 rounded-2xl text-[11px] font-bold uppercase tracking-widest bg-red-50 text-red-500 border border-red-100 text-center">
-                {serverError}
+                {serverError === 'needsVerification' ? t('verify.needsVerification') : serverError}
               </div>
             )}
             {successMsg && (
